@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<canvas></canvas>
+	<script>
+		var url = new URL(document.URL);
+		url.protocol = "ws:";
+		url.port = 8080;
+
+		var ws = new WebSocket(url);
+		
+		var canvas = document.querySelector(`canvas`);
+		var ctx = canvas.getContext("2d");
+		canvas.width = 800;
+		canvas.height = 600;
+		var isDown = false;
+		var n = 0;
+
+		canvas.addEventListener("mousedown", e=>{isDown = true; n=0;});
+		canvas.addEventListener("touchstart", e=>{isDown = true; n=0;});
+		canvas.addEventListener("mouseup", e=>{isDown = false});
+		canvas.addEventListener("touchend", e=>{isDown = false});
+
+		canvas.addEventListener("mousemove", e=>{
+			if (isDown)
+			{
+				let data = 
+				{
+					n: n,
+					x: e.clientX,
+					y: e.clientY
+				}
+				n++;
+				ws.send(JSON.stringify(data));
+			}
+		});
+		canvas.addEventListener("touchmove", e=>{
+			
+				let data = 
+				{
+					n: n,
+					x: e.touches[0].clientX,
+					y: e.touches[0].clientY
+				}
+				n++;
+				ws.send(JSON.stringify(data));
+			
+		});
+
+		ws.onmessage = (msg)=>
+		{
+			let data = JSON.parse(msg.data);
+
+			if (data.n == 0)
+			{
+				ctx.moveTo(data.x, data.y);
+			}
+			else
+			{
+				ctx.lineTo(data.x, data.y);
+				ctx.stroke();
+			}
+		}
+
+
+	</script>
+</body>
+</html>
