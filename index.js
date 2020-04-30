@@ -1,17 +1,14 @@
 var WebsocketServer = require(`websocket`).server;
-var http = require(`http`);
+
 var express = require(`express`);
 
 
 
+// express server
+var app = express();
+app.use(express.static(`./public`));
+var server = app.listen(80);
 
-// http server
-var server = http.createServer((request, response)=>{
-	console.log(`request for ${request.url}`);
-	response.write('hello');
-	response.end();
-});
-server.listen(8080,()=>{console.log("listening");} );
 
 
 // websocket server
@@ -36,10 +33,6 @@ connection.on("close",(reason, description)=>
 )
 })
 
-// express server
-var app = express();
-app.use(express.static(`./public`));
-app.listen(80);
 
 
 process.stdin.setRawMode(true);
